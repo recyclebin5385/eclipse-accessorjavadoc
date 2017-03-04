@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <category
+            name="AccessorJavadoc"
+            id="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.category">
+      </category>
+      <command
+            name="Generate getter/setter Javadocs from field Javadoc"
+            categoryId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.category"
+            id="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
+            class="recyclebin5385.eclipse.plugin.accessorjavadoc.handlers.GenerateAccessorJavadocHandler">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.bindings">
+      <key
+            commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
+            contextId="org.eclipse.ui.textEditorScope"
+            sequence="Ctrl+Shift+D"
+            schemeId="org.eclipse.ui.defaultAcceleratorConfiguration">
+      </key>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               label="Javadoc"
+               mnemonic="J"
+               id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.accessorJavadocMenu">
+            <command
+                  commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
+                  mnemonic="G"
+                  id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.generateAccessorJavadocCommand">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferencePage"
+            id="recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferencePage"
+            name="Getter/Setter Javadoc Preferences">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+
+</plugin>

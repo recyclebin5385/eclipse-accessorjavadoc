@@ -9,7 +9,7 @@
             id="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.category">
       </category>
       <command
-            name="Generate getter/setter Javadocs from field Javadoc"
+            name="Generate getter/setter Javadocs from field Javadoc..."
             categoryId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.category"
             id="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand">
       </command>
@@ -33,17 +33,17 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               label="Javadoc"
-               mnemonic="J"
-               id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.accessorJavadocMenu">
-            <command
-                  commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
-                  mnemonic="G"
-                  id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.generateAccessorJavadocCommand">
-            </command>
-         </menu>
+            allPopups="true"
+            locationURI="popup:org.eclipse.jdt.ui.source.menu?after=additions">
+         <separator
+               name="recyclebin5385.eclipse.plugin.accessorjavadoc.separator1"
+               visible="true">
+         </separator>
+         <command
+               commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
+               id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.generateAccessorJavadocCommand"
+               mnemonic="J">
+         </command>
       </menuContribution>
    </extension>
    <extension

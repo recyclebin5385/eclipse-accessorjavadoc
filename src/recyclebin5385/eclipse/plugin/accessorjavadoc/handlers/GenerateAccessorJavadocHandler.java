@@ -1,7 +1,10 @@
 package recyclebin5385.eclipse.plugin.accessorjavadoc.handlers;
 
 import java.text.BreakIterator;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -31,11 +34,13 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import recyclebin5385.eclipse.plugin.accessorjavadoc.Activator;
 import recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferenceConstants;
+import recyclebin5385.eclipse.plugin.accessorjavadoc.wizards.GenerateAccessorJavadocWizard;
 
 /**
  * Javaのソースコードのgetter、setterのJavadocを生成するプラグインの {@link IHandler}。
@@ -50,6 +55,17 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
         private String m_javadocTextBeforeSummary;
 
         private String m_javadocTextAfterSummary;
+    }
+
+
+    private static class AccessorInfo {
+        private IMethod m_method;
+
+        private String m_fieldName;
+
+        private boolean m_getter;
+
+        private Javadoc m_javadoc;
     }
 
 
@@ -114,6 +130,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
         IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 
+        
         /*----------------------------------------------------------------
          * エディタの内容から型の情報を取得する
          *----------------------------------------------------------------*/
@@ -135,7 +152,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
 
         /*----------------------------------------------------------------
-         *Javadocコメントをすべて取得する
+         * Javadocコメントをすべて取得する
          *----------------------------------------------------------------*/
 
         ASTParser parser = ASTParser.newParser(AST.JLS8);
@@ -236,18 +253,17 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                 fieldInfoMap.put(fieldName, fieldInfo);
             }
         } catch (JavaModelException | BadLocationException exception) {
-            // TODO Auto-generated catch block
-            exception.printStackTrace();
+            return null;
         }
 
 
-        /*----------------------------------------------------------------
-         * getter、setterのJavadocを置換する
-         *----------------------------------------------------------------*/
-
-        int offset = 0;
-
         try {
+            /*----------------------------------------------------------------
+             * getter、setterの情報を収集する
+             *----------------------------------------------------------------*/
+
+            List<AccessorInfo> accessorInfoList = new ArrayList<>();
+
             for (IMethod method : type.getMethods()) {
                 Matcher accesorNameMatcher = ACCESSOR_PATTERN.matcher(method.getElementName());
                 if (!accesorNameMatcher.matches()) {
@@ -255,20 +271,15 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                     continue;
                 }
 
-                FieldInfo fieldInfo = fieldInfoMap.get(accesorNameMatcher.group(2).toLowerCase());
+                String fieldName = accesorNameMatcher.group(2).toLowerCase();
+                FieldInfo fieldInfo = fieldInfoMap.get(fieldName);
                 if (fieldInfo == null) {
                     // 対応する項目のJavadocがない場合は処理しない
                     continue;
                 }
 
 
-                // テンプレートおよびテンプレートの変数を求める
-
-                Map<String, String> parameterMap = new HashMap<>();
-                parameterMap.put("label", fieldInfo.m_label);
-
-                String summaryTemplate;
-                String suffixTemplate;
+                AccessorInfo accessorInfo = new AccessorInfo();
 
                 switch (accesorNameMatcher.group(1)) {
                 case "set":
@@ -280,10 +291,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                         continue;
                     }
 
-                    parameterMap.put("param", method.getParameterNames()[0]);
-
-                    summaryTemplate = setterJavadocSummaryTemplate;
-                    suffixTemplate = setterJavadocSuffixTemplate;
+                    accessorInfo.m_getter = false;
 
                     break;
 
@@ -292,24 +300,77 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                         continue;
                     }
 
-                    summaryTemplate = getterJavadocSummaryTemplate;
-                    suffixTemplate = getterJavadocSuffixTemplate;
+                    accessorInfo.m_getter = true;
 
                     break;
+                }
+
+                accessorInfo.m_method = method;
+                accessorInfo.m_fieldName = fieldName;
+                accessorInfo.m_javadoc = getJavadoc(method, javadocMap);
+
+                accessorInfoList.add(accessorInfo);
+            }
+
+
+            /*----------------------------------------------------------------
+             * ダイアログを開く
+             *----------------------------------------------------------------*/
+
+            Map<IMethod, Boolean> methodSelectionMap = new LinkedHashMap<>();
+            for (AccessorInfo accessorInfo : accessorInfoList) {
+                methodSelectionMap.put(accessorInfo.m_method, Boolean.TRUE);
+            }
+
+            GenerateAccessorJavadocWizard wizard = new GenerateAccessorJavadocWizard(methodSelectionMap);
+            WizardDialog dialog = new WizardDialog(null, wizard);
+            if (dialog.open() != WizardDialog.OK) {
+                return null;
+            }
+
+
+            /*----------------------------------------------------------------
+             * getter、setterのJavadocを置換する
+             *----------------------------------------------------------------*/
+
+            int offset = 0;
+
+            for (AccessorInfo accessorInfo : accessorInfoList) {
+                if (!methodSelectionMap.get(accessorInfo.m_method)) {
+                    continue;
+                }
+
+                FieldInfo fieldInfo = fieldInfoMap.get(accessorInfo.m_fieldName);
+
+
+                // テンプレートおよびテンプレートの変数を求める
+
+                Map<String, String> parameterMap = new HashMap<>();
+                parameterMap.put("label", fieldInfo.m_label);
+
+                String summaryTemplate;
+                String suffixTemplate;
+
+                if (accessorInfo.m_getter) {
+                    summaryTemplate = getterJavadocSummaryTemplate;
+                    suffixTemplate = getterJavadocSuffixTemplate;
+                } else {
+                    parameterMap.put("param", accessorInfo.m_method.getParameterNames()[0]);
+
+                    summaryTemplate = setterJavadocSummaryTemplate;
+                    suffixTemplate = setterJavadocSuffixTemplate;
                 }
 
 
                 // メンバ変数のJavadocを置換し、getterまたはsetterに設定する
 
-                Javadoc methodJavadoc = getJavadoc(method, javadocMap);
-
-                int start = offset + (methodJavadoc != null ? methodJavadoc.getStartPosition()
-                        : method.getSourceRange().getOffset());
+                int start = offset + (accessorInfo.m_javadoc != null ? accessorInfo.m_javadoc.getStartPosition()
+                        : accessorInfo.m_method.getSourceRange().getOffset());
                 int lineOffset = document.getLineOffset(document.getLineOfOffset(start));
                 String indent = NONSPACE_PATTERN.matcher(document.get(lineOffset, start - lineOffset)).replaceAll(" ");
 
 
-                int oldLength = methodJavadoc != null ? methodJavadoc.getLength() : 0;
+                int oldLength = accessorInfo.m_javadoc != null ? accessorInfo.m_javadoc.getLength() : 0;
 
 
                 String newSummary = replaceVariables(summaryTemplate, parameterMap);
@@ -320,7 +381,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                         + fieldInfo.m_javadocTextAfterSummary;
                 newMethodJavadocText = JAVADOC_TAIL_PATTERN.matcher(newMethodJavadocText)
                         .replaceFirst("\n" + newSuffix);
-                if (methodJavadoc == null) {
+                if (accessorInfo.m_javadoc == null) {
                     newMethodJavadocText += "\n";
                 }
                 newMethodJavadocText = NEWLINE_PATTERN.matcher(newMethodJavadocText).replaceAll("$0" + indent);

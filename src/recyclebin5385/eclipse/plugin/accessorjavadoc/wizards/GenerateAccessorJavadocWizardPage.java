@@ -15,11 +15,23 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 
+/**
+ * {@link GenerateAccessorJavadocWizard}のページ。
+ * 
+ * @author owner
+ *
+ */
 public class GenerateAccessorJavadocWizardPage extends WizardPage {
     private final Map<IMethod, Boolean> m_methodSelectionMap;
 
     private Table m_table;
 
+    /**
+     * コンストラクタ。
+     * 
+     * @param methodSelectionMap
+     *            メソッド→選択状態のマップ
+     */
     public GenerateAccessorJavadocWizardPage(Map<IMethod, Boolean> methodSelectionMap) {
         super("Generate getter/setter Javadoc");
         m_methodSelectionMap = methodSelectionMap;
@@ -76,6 +88,9 @@ public class GenerateAccessorJavadocWizardPage extends WizardPage {
         getWizard().getContainer().updateButtons();
     }
 
+    /**
+     * メソッド→選択状態のマップを更新する。
+     */
     public void updateMethodSelectionMap() {
         if (m_table != null) {
             for (TableItem item : m_table.getItems()) {

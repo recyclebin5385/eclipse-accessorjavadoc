@@ -33,17 +33,42 @@
    <extension
          point="org.eclipse.ui.menus">
       <menuContribution
-            allPopups="true"
-            locationURI="popup:org.eclipse.jdt.ui.source.menu?after=additions">
-         <separator
-               name="recyclebin5385.eclipse.plugin.accessorjavadoc.separator1"
-               visible="true">
-         </separator>
-         <command
-               commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
-               id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.generateAccessorJavadocCommand"
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               label="Javadoc"
                mnemonic="J">
-         </command>
+            <command
+                  commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
+                  mnemonic="J">
+            </command>
+            <visibleWhen>
+               <with
+                     variable="activeEditorId">
+                  <equals
+                        value="org.eclipse.jdt.ui.CompilationUnitEditor">
+                  </equals>
+               </with>
+            </visibleWhen>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            locationURI="popup:org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext?after=additions">
+         <menu
+               label="Javadoc"
+               mnemonic="J">
+            <command commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
+                  id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.generateAccessorJavadocCommandContext"
+                  mnemonic="J">
+            </command>
+            <visibleWhen>
+               <with
+                     variable="activeEditorId">
+                  <equals
+                        value="org.eclipse.jdt.ui.CompilationUnitEditor">
+                  </equals>
+               </with>
+            </visibleWhen>            
+         </menu>
       </menuContribution>
    </extension>
    <extension

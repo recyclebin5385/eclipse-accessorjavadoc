@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
@@ -11,6 +12,8 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -48,10 +51,16 @@ public class AccessorSelectionDialog extends Dialog {
     protected Control createDialogArea(Composite parent) {
         Composite ret = (Composite) super.createDialogArea(parent);
 
+        ret.setLayout(new GridLayout(2, false));
 
-        new Label(ret, SWT.NONE).setText("Select methods to create getters/setters:");
+        Label tableLabel = new Label(ret, SWT.NONE);
+        tableLabel.setText("Select methods to create getters/setters:");
+        GridData tableLabelGridData = new GridData(GridData.FILL_HORIZONTAL);
+        tableLabelGridData.horizontalSpan = 2;
+        tableLabel.setLayoutData(tableLabelGridData);
 
         m_table = new Table(ret, SWT.BORDER | SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL);
+
         m_table.setLayoutData(new GridData(GridData.FILL_BOTH));
         for (Entry<IMethod, Boolean> entry : m_methodSelectionMap.entrySet()) {
             TableItem item = new TableItem(m_table, SWT.NONE);
@@ -72,7 +81,62 @@ public class AccessorSelectionDialog extends Dialog {
             }
         });
 
+
+        Composite buttonPane = new Composite(ret, SWT.NONE);
+        buttonPane.setLayout(new RowLayout(SWT.VERTICAL));
+        buttonPane.setLayoutData(new GridData(SWT.NONE, SWT.BEGINNING, false, false));
+
+        Button selectAllButton = new Button(buttonPane, SWT.NONE);
+        selectAllButton.setText("Select &All");
+        selectAllButton.addSelectionListener(createButtonSelectionListener(true, true));
+
+        Button deselectAllButton = new Button(buttonPane, SWT.NONE);
+        deselectAllButton.setText("&Deselect All");
+        deselectAllButton.addSelectionListener(createButtonSelectionListener(false, false));
+
+        Button selectGettersButton = new Button(buttonPane, SWT.NONE);
+        selectGettersButton.setText("Select &Getters");
+        selectGettersButton.addSelectionListener(createButtonSelectionListener(true, false));
+
+        Button selectSettersButton = new Button(buttonPane, SWT.NONE);
+        selectSettersButton.setText("Select &Setters");
+        selectSettersButton.addSelectionListener(createButtonSelectionListener(false, true));
+
+
         return ret;
+    }
+
+    private SelectionListener createButtonSelectionListener(boolean getterSelected, boolean setterSelected) {
+        return new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                execute();
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                execute();
+            }
+
+            private void execute() {
+                for (TableItem item : m_table.getItems()) {
+                    IMethod method = (IMethod) item.getData();
+                    try {
+                        if (method.getReturnType().equals("V")) {
+                            // setter
+                            item.setChecked(setterSelected);
+                        } else {
+                            // getter
+                            item.setChecked(getterSelected);
+                        }
+                    } catch (JavaModelException e) {
+                        // NOTE 何もしない
+                    }
+                }
+                
+                updateButtonStatus();
+            }
+        };
     }
 
     private void updateButtonStatus() {

@@ -9,7 +9,7 @@
             id="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.category">
       </category>
       <command
-            name="Generate getter/setter Javadocs from field Javadoc..."
+            name="Generate Getter/Setter Javadocs from Field Javadocs..."
             categoryId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.category"
             id="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand">
       </command>
@@ -35,7 +35,7 @@
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu
-               label="Javadoc"
+               label="AccessorJavadoc"
                mnemonic="J">
             <command
                   commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
@@ -54,7 +54,7 @@
       <menuContribution
             locationURI="popup:org.eclipse.jdt.ui.CompilationUnitEditor.EditorContext?after=additions">
          <menu
-               label="Javadoc"
+               label="AccessorJavadoc"
                mnemonic="J">
             <command commandId="recyclebin5385.eclipse.plugin.accessorjavadoc.commands.generateAccessorJavadocCommand"
                   id="recyclebin5385.eclipse.plugin.accessorjavadoc.menus.generateAccessorJavadocCommandContext"
@@ -76,7 +76,7 @@
       <page
             class="recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferencePage"
             id="recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferencePage"
-            name="Getter/Setter Javadoc Preferences">
+            name="AccessorJavadoc">
       </page>
    </extension>
    <extension

@@ -83,6 +83,10 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\r\n|\r|\n");
 
+    private static final String DEFAULT_GETTER_JAVADOC_SUFFIX_TEMPLATE = " *\n * @return ${label}\n */";
+
+    private static final String DEFAULT_SETTER_JAVADOC_SUFFIX_TEMPLATE = " *\n * @param ${param}\n *            ${label}\n */";
+
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -97,10 +101,8 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                 .getString(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE);
         String setterJavadocSummaryTemplate = preferenceStore
                 .getString(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE);
-        String getterJavadocSuffixTemplate = preferenceStore
-                .getString(PreferenceConstants.P_GETTER_JAVADOC_SUFFIX_TEMPLATE);
-        String setterJavadocSuffixTemplate = preferenceStore
-                .getString(PreferenceConstants.P_SETTER_JAVADOC_SUFFIX_TEMPLATE);
+        String getterJavadocSuffixTemplate = DEFAULT_GETTER_JAVADOC_SUFFIX_TEMPLATE;
+        String setterJavadocSuffixTemplate = DEFAULT_SETTER_JAVADOC_SUFFIX_TEMPLATE;
 
 
         Pattern fieldNamePattern;
@@ -130,7 +132,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
         IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
 
-        
+
         /*----------------------------------------------------------------
          * エディタの内容から型の情報を取得する
          *----------------------------------------------------------------*/

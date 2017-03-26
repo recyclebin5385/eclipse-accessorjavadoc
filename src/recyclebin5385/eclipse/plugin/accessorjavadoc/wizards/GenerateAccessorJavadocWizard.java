@@ -25,7 +25,7 @@ public class GenerateAccessorJavadocWizard extends Wizard {
     public GenerateAccessorJavadocWizard(Map<IMethod, Boolean> methodSelectionMap) {
         m_page = new GenerateAccessorJavadocWizardPage(methodSelectionMap);
 
-        setWindowTitle("Add Javadoc to getters/setters of the class");
+        setWindowTitle("Generate Getter/Setter Javadocs from Field Javadocs");
         addPage(m_page);
     }
 

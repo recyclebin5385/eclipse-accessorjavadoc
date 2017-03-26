@@ -15,8 +15,5 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.P_FIELD_NAME_REGEX, "(?:[ms]?_)(.+)");
         store.setDefault(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE, "Gets ${label}.");
         store.setDefault(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE, "Sets ${label}.");
-        store.setDefault(PreferenceConstants.P_GETTER_JAVADOC_SUFFIX_TEMPLATE, " *\n * @return ${label}\n */");
-        store.setDefault(PreferenceConstants.P_SETTER_JAVADOC_SUFFIX_TEMPLATE,
-                " *\n * @param ${param}\n *            ${label}\n */");
     }
 }

@@ -18,14 +18,4 @@ public class PreferenceConstants {
      * setterのJavadocの概要のテンプレート
      */
     public static final String P_SETTER_JAVADOC_SUMMARY_TEMPLATE = "setterJavadocSummaryTemplate";
-
-    /**
-     * getterのJavadocの末尾のテンプレート
-     */
-    public static final String P_GETTER_JAVADOC_SUFFIX_TEMPLATE = "getterJavadocSuffixTemplate";
-
-    /**
-     * setterのJavadocの末尾のテンプレート
-     */
-    public static final String P_SETTER_JAVADOC_SUFFIX_TEMPLATE = "setterJavadocSuffixTemplate";
 }

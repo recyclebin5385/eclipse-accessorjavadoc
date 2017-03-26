@@ -34,13 +34,11 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import recyclebin5385.eclipse.plugin.accessorjavadoc.Activator;
 import recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferenceConstants;
-import recyclebin5385.eclipse.plugin.accessorjavadoc.wizards.GenerateAccessorJavadocWizard;
 
 /**
  * Javaのソースコードのgetter、setterのJavadocを生成するプラグインの {@link IHandler}。
@@ -324,9 +322,9 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                 methodSelectionMap.put(accessorInfo.m_method, Boolean.TRUE);
             }
 
-            GenerateAccessorJavadocWizard wizard = new GenerateAccessorJavadocWizard(methodSelectionMap);
-            WizardDialog dialog = new WizardDialog(null, wizard);
-            if (dialog.open() != WizardDialog.OK) {
+            AccessorSelectionDialog dialog = new AccessorSelectionDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), methodSelectionMap);
+            if (dialog.open() != AccessorSelectionDialog.OK) {
                 return null;
             }
 

@@ -419,10 +419,74 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
         StringBuffer buffer = new StringBuffer();
         Matcher variableMatcher = VARIABLE_PATTERN.matcher(s);
         while (variableMatcher.find()) {
-            variableMatcher.appendReplacement(buffer, parameterMap.get(variableMatcher.group(1)));
+            String[] variableFields = variableMatcher.group(1).split("\\.");
+            try {
+                String parameterValue = parameterMap.get(variableFields[0]);
+
+                if (variableFields.length > 1) {
+                    switch (variableFields[1]) {
+                    case "capitalized":
+                        parameterValue = capitalize(parameterValue, true, false);
+                        break;
+                        
+                    case "uncapitalized":
+                        parameterValue = capitalize(parameterValue, false, false);
+                        break;
+
+                    case "toUpperCase":
+                        parameterValue = parameterValue.toUpperCase();
+                        break;
+
+                    case "toLowerCase":
+                        parameterValue = parameterValue.toLowerCase();
+                        break;
+
+                    default:
+                        break;
+                    }
+                }
+                variableMatcher.appendReplacement(buffer, parameterValue);
+            } catch (Exception exception) {
+                variableMatcher.appendReplacement(buffer, variableMatcher.group());
+            }
         }
         variableMatcher.appendTail(buffer);
         return buffer.toString();
     }
 
+    private static String capitalize(String s, boolean firstToUpper, boolean forced) {
+        BreakIterator bi = BreakIterator.getWordInstance();
+        bi.setText(s);
+        int boundary = bi.next();
+        String firstWord = boundary == BreakIterator.DONE ? s : s.substring(0, boundary);
+
+        if (firstWord.isEmpty()) {
+            return s;
+        }
+
+        char firstChar = firstWord.charAt(0);
+        boolean firstUpperOrLowerCase = Character.isLowerCase(firstChar) || Character.isUpperCase(firstChar);
+
+        boolean allLowerCase = true;
+        for (int i = 1; i < firstWord.length(); i++) {
+            char c = firstWord.charAt(i);
+            if (!Character.isLowerCase(c)) {
+                allLowerCase = false;
+                break;
+            }
+        }
+
+        // 略語かどうかを検出する
+        boolean conversionRequired = forced || (firstUpperOrLowerCase && allLowerCase);
+
+        if (!conversionRequired) {
+            return s;
+        }
+
+        if (firstToUpper) {
+            return s.substring(0, 1).toUpperCase() + s.substring(1);
+        } else {
+            return s.substring(0, 1).toLowerCase() + s.substring(1);
+        }
+    }
 }

@@ -13,7 +13,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
     public void initializeDefaultPreferences() {
         IPreferenceStore store = Activator.getDefault().getPreferenceStore();
         store.setDefault(PreferenceConstants.P_FIELD_NAME_REGEX, "(?:[ms]?_)(.+)");
-        store.setDefault(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE, "Gets ${label}.");
-        store.setDefault(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE, "Sets ${label}.");
+        store.setDefault(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE, "Gets ${label.uncapitalized}.");
+        store.setDefault(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE, "Sets ${label.uncapitalized}.");
+        store.setDefault(PreferenceConstants.P_PARAM_OR_RETURN_TEMPLATE, "${label.uncapitalized}");
     }
 }

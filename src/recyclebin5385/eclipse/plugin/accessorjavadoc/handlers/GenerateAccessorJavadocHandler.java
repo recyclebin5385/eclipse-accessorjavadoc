@@ -1,11 +1,14 @@
 package recyclebin5385.eclipse.plugin.accessorjavadoc.handlers;
 
 import java.text.BreakIterator;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -69,9 +72,12 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
     private static final Pattern ACCESSOR_PATTERN = Pattern.compile("(get|set|is)(.+)");
 
-    private static final Pattern JAVADOC_SUMMARY_PARTTERN = Pattern.compile("\\s*\\*\\s*(.*?)\\s*");
+    private static final Pattern REMOVE_JAVADOC_HEADER_PARTTERN = Pattern
+            .compile("^[ \t\\x0B\f]*\\*+[ \t\\x0B\f]*(.*?)[ \t\\x0B\f]*$", Pattern.MULTILINE);
 
-    private static final Pattern PERIOD_PATTERN = Pattern.compile("\\s*(.+?)\\s*([.。]\\s*)?");
+    private static final Pattern TRIM_PATTERN = Pattern.compile("[\\x00-\\x20]*(.+?)[\\x00-\\x20]*", Pattern.DOTALL);
+
+    private static final Pattern REMOVE_PERIOD_PATTERN = Pattern.compile("(.+?)\\s*(?:[.。])?", Pattern.DOTALL);
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.+?)\\}");
 
@@ -81,9 +87,9 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
     private static final Pattern NEWLINE_PATTERN = Pattern.compile("\r\n|\r|\n");
 
-    private static final String DEFAULT_GETTER_JAVADOC_SUFFIX_TEMPLATE = " *\n * @return ${label}\n */";
+    private static final String DEFAULT_GETTER_JAVADOC_SUFFIX_TEMPLATE_FORMAT = " *\n * @return {0}\n */";
 
-    private static final String DEFAULT_SETTER_JAVADOC_SUFFIX_TEMPLATE = " *\n * @param ${param}\n *            ${label}\n */";
+    private static final String DEFAULT_SETTER_JAVADOC_SUFFIX_TEMPLATE_FORMAT = " *\n * @param $'{'param'}'\n *            {0}\n */";
 
 
     @Override
@@ -99,8 +105,10 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                 .getString(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE);
         String setterJavadocSummaryTemplate = preferenceStore
                 .getString(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE);
-        String getterJavadocSuffixTemplate = DEFAULT_GETTER_JAVADOC_SUFFIX_TEMPLATE;
-        String setterJavadocSuffixTemplate = DEFAULT_SETTER_JAVADOC_SUFFIX_TEMPLATE;
+        String getterJavadocSuffixTemplate = MessageFormat.format(DEFAULT_GETTER_JAVADOC_SUFFIX_TEMPLATE_FORMAT,
+                preferenceStore.getString(PreferenceConstants.P_PARAM_OR_RETURN_TEMPLATE));
+        String setterJavadocSuffixTemplate = MessageFormat.format(DEFAULT_SETTER_JAVADOC_SUFFIX_TEMPLATE_FORMAT,
+                preferenceStore.getString(PreferenceConstants.P_PARAM_OR_RETURN_TEMPLATE));
 
 
         Pattern fieldNamePattern;
@@ -197,7 +205,16 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
                 FieldInfo fieldInfo = new FieldInfo();
 
-                String summary = null;
+
+                /*----------------------------------------------------------------
+                 * Javadocから概要を切り出す
+                 *----------------------------------------------------------------*/
+
+
+                // タグの中での概要のオフセット
+                int summaryStartOffset = 0;
+                int summaryEndOffset = 0;
+
                 for (Object oTag : fieldJavadoc.tags()) {
                     TagElement tag = (TagElement) oTag;
                     if (tag.getTagName() != null) {
@@ -205,31 +222,87 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                     }
 
 
+                    // タグの文字列を切り出す
+
+                    // Javadoc全体の中でのタグの開始位置のオフセット
+                    int tagStartOffset = tag.getStartPosition() - fieldJavadoc.getStartPosition();
+
                     String tagText = document.get(tag.getStartPosition(), tag.getLength());
-                    Matcher matcher = JAVADOC_SUMMARY_PARTTERN.matcher(tagText);
-                    if (matcher.matches()) {
-                        tagText = matcher.group(1);
+
+
+                    // タグの文字列の各行の行頭の*を削除する
+
+                    // 行頭の*を除去した後の文字の位置→除去する前の文字の位置のマップ
+                    TreeMap<Integer, Integer> tagTextPositionMap = new TreeMap<>();
+
+                    Matcher removeJavadocHeaderMatcher = REMOVE_JAVADOC_HEADER_PARTTERN.matcher(tagText);
+                    StringBuffer tagTextBuffer = new StringBuffer();
+                    int lastMatchEnd = 0;
+                    while (removeJavadocHeaderMatcher.find()) {
+                        tagTextPositionMap.put(
+                                tagTextBuffer.length() + removeJavadocHeaderMatcher.start() - lastMatchEnd,
+                                removeJavadocHeaderMatcher.start(1));
+                        removeJavadocHeaderMatcher.appendReplacement(tagTextBuffer, "$1");
+                        tagTextPositionMap.put(tagTextBuffer.length(), removeJavadocHeaderMatcher.end());
+                        lastMatchEnd = removeJavadocHeaderMatcher.end();
                     }
+                    removeJavadocHeaderMatcher.appendTail(tagTextBuffer);
+
+                    tagText = tagTextBuffer.toString();
+
+
+                    // 概要となる最初の文を切り出す
 
                     BreakIterator bi = BreakIterator.getSentenceInstance();
                     bi.setText(tagText);
-                    int boundary = bi.next();
-                    summary = boundary == BreakIterator.DONE ? tagText : tagText.substring(0, boundary);
-                    summary = summary.trim();
+                    int sentenceBoundary = bi.next();
+                    if (sentenceBoundary == BreakIterator.DONE) {
+                        sentenceBoundary = tagText.length();
+                    }
+                    String firstSentence = tagText.substring(0, sentenceBoundary);
 
-                    fieldInfo.m_label = summary;
-                    Matcher matcher2 = PERIOD_PATTERN.matcher(summary);
-                    if (matcher2.matches()) {
-                        fieldInfo.m_label = matcher2.group(1);
+
+                    // 概要となる文の前後の非表示文字を除去する
+
+                    Matcher firstSentenceMatcher = TRIM_PATTERN.matcher(firstSentence);
+                    String summary;
+                    int summaryStartOffsetInTag;
+                    if (firstSentenceMatcher.matches()) {
+                        summaryStartOffsetInTag = firstSentenceMatcher.start(1);
+                        summary = firstSentenceMatcher.group(1);
+                    } else {
+                        summaryStartOffsetInTag = 0;
+                        summary = firstSentence;
+                    }
+
+
+                    // 概要の位置を記憶する
+
+                    summaryStartOffset = tagStartOffset + replaceIndex(summaryStartOffsetInTag, tagTextPositionMap);
+                    summaryEndOffset = tagStartOffset
+                            + replaceIndex(summaryStartOffsetInTag + summary.length(), tagTextPositionMap);
+
+
+                    // 概要の句点を除去してラベルとする
+
+                    Matcher removePeriodMatcher = REMOVE_PERIOD_PATTERN.matcher(summary);
+                    if (removePeriodMatcher.matches()) {
+                        fieldInfo.m_label = removePeriodMatcher.group(1);
+                    } else {
+                        fieldInfo.m_label = summary;
                     }
 
                     break;
                 }
 
-                if (summary == null || summary.isEmpty()) {
+                if (fieldInfo.m_label == null || fieldInfo.m_label.isEmpty()) {
                     continue;
                 }
 
+
+                /*----------------------------------------------------------------
+                 * 概要の前後のJavadocを求める
+                 *----------------------------------------------------------------*/
 
                 int fieldJavadocStart = fieldJavadoc.getStartPosition();
                 int fieldJavadocLineOffset = document.getLineOffset(document.getLineOfOffset(fieldJavadocStart));
@@ -237,17 +310,16 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                         .matcher(document.get(fieldJavadocLineOffset, fieldJavadocStart - fieldJavadocLineOffset))
                         .replaceAll(" ");
 
+
                 Pattern indentPattern = Pattern.compile("^" + Pattern.quote(fieldJavadocIndent), Pattern.MULTILINE);
-                String javadocText = document.get(fieldJavadocStart, fieldJavadoc.getLength());
-                javadocText = indentPattern.matcher(javadocText).replaceAll("");
+                String javadocText = document.get(fieldJavadoc.getStartPosition(), fieldJavadoc.getLength());
 
+                fieldInfo.m_javadocTextBeforeSummary = indentPattern
+                        .matcher(javadocText.substring(0, summaryStartOffset)).replaceAll("");
 
-                int summaryOffset = javadocText.indexOf(summary);
-                if (summaryOffset == -1) {
-                    continue;
-                }
-                fieldInfo.m_javadocTextBeforeSummary = javadocText.substring(0, summaryOffset);
-                fieldInfo.m_javadocTextAfterSummary = javadocText.substring(summaryOffset + summary.length());
+                // NOTE 先頭の空白を必ず残すためにダミーのインデントを追加してから置換する
+                fieldInfo.m_javadocTextAfterSummary = indentPattern
+                        .matcher(fieldJavadocIndent + javadocText.substring(summaryEndOffset)).replaceAll("");
 
 
                 fieldInfoMap.put(fieldName, fieldInfo);
@@ -403,6 +475,15 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
     }
 
 
+    private static int replaceIndex(int index, NavigableMap<Integer, Integer> indexMap) {
+        Entry<Integer, Integer> entry = indexMap.floorEntry(index);
+        if (entry == null) {
+            return index;
+        }
+
+        return entry.getValue() + index - entry.getKey();
+    }
+
     private static Javadoc getJavadoc(ISourceReference sourceReference, TreeMap<Integer, Javadoc> javadocMap)
             throws JavaModelException {
         SortedMap<Integer, Javadoc> tmpMap = javadocMap.subMap(sourceReference.getSourceRange().getOffset(),
@@ -428,7 +509,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                     case "capitalized":
                         parameterValue = capitalize(parameterValue, true, false);
                         break;
-                        
+
                     case "uncapitalized":
                         parameterValue = capitalize(parameterValue, false, false);
                         break;

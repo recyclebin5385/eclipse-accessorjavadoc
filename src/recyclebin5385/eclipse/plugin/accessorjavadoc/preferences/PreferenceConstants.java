@@ -18,4 +18,9 @@ public class PreferenceConstants {
      * setterのJavadocの概要のテンプレート
      */
     public static final String P_SETTER_JAVADOC_SUMMARY_TEMPLATE = "setterJavadocSummaryTemplate";
+    
+    /**
+     * getterの@paramまたはsetterの@returnの値のテンプレート
+     */
+    public static final String P_PARAM_OR_RETURN_TEMPLATE = "paramOrReturnValueTemplate";
 }

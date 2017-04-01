@@ -26,11 +26,12 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     public void createFieldEditors() {
         addField(new StringFieldEditor(PreferenceConstants.P_FIELD_NAME_REGEX, "Field name &regex:",
                 getFieldEditorParent()));
-
         addField(new StringFieldEditor(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE,
                 "&Getter summary template:", getFieldEditorParent()));
         addField(new StringFieldEditor(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE,
                 "&Setter summary template:", getFieldEditorParent()));
+        addField(new StringFieldEditor(PreferenceConstants.P_PARAM_OR_RETURN_TEMPLATE,
+                "@&param NAME or @return template:", getFieldEditorParent()));
     }
 
     @Override

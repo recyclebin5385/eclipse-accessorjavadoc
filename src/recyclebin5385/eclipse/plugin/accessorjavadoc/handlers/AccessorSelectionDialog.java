@@ -1,7 +1,6 @@
 package recyclebin5385.eclipse.plugin.accessorjavadoc.handlers;
 
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.List;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -30,7 +29,111 @@ import org.eclipse.swt.widgets.TableItem;
  *
  */
 public class AccessorSelectionDialog extends Dialog {
-    private final Map<IMethod, Boolean> m_methodSelectionMap;
+    /**
+     * メソッドの状態。
+     * 
+     * @author owner
+     *
+     */
+    public static class MethodState {
+        /**
+         * メソッド
+         */
+        private IMethod m_method;
+
+        /**
+         * 選択されているかどうか
+         */
+        private boolean m_selected;
+
+        /**
+         * Javadocが存在するかどうか
+         */
+        private boolean m_documented;
+
+        /**
+         * タグにより除外対象と指定されているかどうか
+         */
+        private boolean m_taggedAsExcluded;
+
+        /**
+         * メソッドを取得する。
+         *
+         * @return メソッド
+         */
+        public IMethod getMethod() {
+            return m_method;
+        }
+
+        /**
+         * メソッドを設定する。
+         *
+         * @param method
+         *            メソッド
+         */
+        public void setMethod(IMethod method) {
+            m_method = method;
+        }
+
+        /**
+         * 選択されているかどうかを取得する。
+         *
+         * @return 選択されているかどうか
+         */
+        public boolean isSelected() {
+            return m_selected;
+        }
+
+        /**
+         * 選択されているかどうかを設定する。
+         *
+         * @param selected
+         *            選択されているかどうか
+         */
+        public void setSelected(boolean selected) {
+            m_selected = selected;
+        }
+
+        /**
+         * Javadocが存在するかどうかを取得する。
+         *
+         * @return Javadocが存在するかどうか
+         */
+        public boolean isDocumented() {
+            return m_documented;
+        }
+
+        /**
+         * Javadocが存在するかどうかを設定する。
+         *
+         * @param documented
+         *            Javadocが存在するかどうか
+         */
+        public void setDocumented(boolean documented) {
+            m_documented = documented;
+        }
+
+        /**
+         * タグにより除外対象と指定されているかどうかを取得する。
+         *
+         * @return タグにより除外対象と指定されているかどうか
+         */
+        public boolean isTaggedAsExcluded() {
+            return m_taggedAsExcluded;
+        }
+
+        /**
+         * タグにより除外対象と指定されているかどうかを設定する。
+         *
+         * @param taggedAsExcluded
+         *            タグにより除外対象と指定されているかどうか
+         */
+        public void setTaggedAsExcluded(boolean taggedAsExcluded) {
+            m_taggedAsExcluded = taggedAsExcluded;
+        }
+    }
+
+    private final List<MethodState> m_methodStateList;
 
     private Table m_table;
 
@@ -39,12 +142,12 @@ public class AccessorSelectionDialog extends Dialog {
      * 
      * @param parentShell
      *            親のシェル
-     * @param methodSelectionMap
-     *            メソッド→選択状態のマップ
+     * @param methodStateList
+     *            メソッド状態のリスト
      */
-    public AccessorSelectionDialog(Shell parentShell, Map<IMethod, Boolean> methodSelectionMap) {
+    public AccessorSelectionDialog(Shell parentShell, List<MethodState> methodStateList) {
         super(parentShell);
-        m_methodSelectionMap = methodSelectionMap;
+        m_methodStateList = methodStateList;
     }
 
     @Override
@@ -62,11 +165,11 @@ public class AccessorSelectionDialog extends Dialog {
         m_table = new Table(ret, SWT.BORDER | SWT.CHECK | SWT.H_SCROLL | SWT.V_SCROLL);
 
         m_table.setLayoutData(new GridData(GridData.FILL_BOTH));
-        for (Entry<IMethod, Boolean> entry : m_methodSelectionMap.entrySet()) {
+        for (MethodState methodState : m_methodStateList) {
             TableItem item = new TableItem(m_table, SWT.NONE);
-            item.setText(entry.getKey().getElementName());
-            item.setData(entry.getKey());
-            item.setChecked(entry.getValue());
+            item.setText(methodState.m_method.getElementName());
+            item.setData(methodState);
+            item.setChecked(methodState.isSelected());
         }
 
         m_table.addSelectionListener(new SelectionListener() {
@@ -120,9 +223,9 @@ public class AccessorSelectionDialog extends Dialog {
 
             private void execute() {
                 for (TableItem item : m_table.getItems()) {
-                    IMethod method = (IMethod) item.getData();
+                    MethodState methodState = (MethodState) item.getData();
                     try {
-                        if (method.getReturnType().equals("V")) {
+                        if (methodState.m_method.getReturnType().equals("V")) {
                             // setter
                             item.setChecked(setterSelected);
                         } else {
@@ -133,7 +236,7 @@ public class AccessorSelectionDialog extends Dialog {
                         // NOTE 何もしない
                     }
                 }
-                
+
                 updateButtonStatus();
             }
         };
@@ -160,7 +263,7 @@ public class AccessorSelectionDialog extends Dialog {
     private void updateMethodSelectionMap() {
         if (m_table != null) {
             for (TableItem item : m_table.getItems()) {
-                m_methodSelectionMap.put((IMethod) item.getData(), item.getChecked());
+                ((MethodState) item.getData()).m_selected = item.getChecked();
             }
         }
     }

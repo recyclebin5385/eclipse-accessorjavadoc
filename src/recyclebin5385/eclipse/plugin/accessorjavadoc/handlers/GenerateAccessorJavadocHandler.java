@@ -4,7 +4,6 @@ import java.text.BreakIterator;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,6 +40,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 import recyclebin5385.eclipse.plugin.accessorjavadoc.Activator;
+import recyclebin5385.eclipse.plugin.accessorjavadoc.handlers.AccessorSelectionDialog.MethodState;
 import recyclebin5385.eclipse.plugin.accessorjavadoc.preferences.PreferenceConstants;
 
 /**
@@ -67,6 +67,8 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
         private boolean m_getter;
 
         private Javadoc m_javadoc;
+
+        private MethodState m_methodState;
     }
 
 
@@ -89,6 +91,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
     private static final String DEFAULT_SETTER_JAVADOC_SUFFIX_TEMPLATE_FORMAT = " *\n * @param $'{'param'}'\n *            {0}\n */";
 
+    private static final String TAG_NAME_EXCLUDED = "@accessorjavadoc.excluded";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -393,13 +396,31 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
              * ダイアログを開く
              *----------------------------------------------------------------*/
 
-            Map<IMethod, Boolean> methodSelectionMap = new LinkedHashMap<>();
+            List<MethodState> methodStateList = new ArrayList<>();
             for (AccessorInfo accessorInfo : accessorInfoList) {
-                methodSelectionMap.put(accessorInfo.m_method, Boolean.TRUE);
+                MethodState methodState = new MethodState();
+                methodStateList.add(methodState);
+                accessorInfo.m_methodState = methodState;
+
+
+                methodState.setMethod(accessorInfo.m_method);
+                if (accessorInfo.m_javadoc != null) {
+                    methodState.setDocumented(true);
+
+                    for (Object oTag : accessorInfo.m_javadoc.tags()) {
+                        TagElement tag = (TagElement) oTag;
+                        if (TAG_NAME_EXCLUDED.equals(tag.getTagName())) {
+                            methodState.setTaggedAsExcluded(true);
+                            break;
+                        }
+                    }
+                }
+
+                methodState.setSelected(!methodState.isTaggedAsExcluded());
             }
 
             AccessorSelectionDialog dialog = new AccessorSelectionDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), methodSelectionMap);
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), methodStateList);
             if (dialog.open() != AccessorSelectionDialog.OK) {
                 return null;
             }
@@ -412,7 +433,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
             int offset = 0;
 
             for (AccessorInfo accessorInfo : accessorInfoList) {
-                if (!methodSelectionMap.get(accessorInfo.m_method)) {
+                if (!accessorInfo.m_methodState.isSelected()) {
                     continue;
                 }
 

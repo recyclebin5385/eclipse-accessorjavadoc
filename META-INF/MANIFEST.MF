@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Getter/Setter Javadoc Generator
 Bundle-SymbolicName: recyclebin5385.eclipse.plugin.accessorjavadoc;singleton:=true
-Bundle-Version: 0.1.0.20170304-0953
+Bundle-Version: 0.1.0
 Bundle-Vendor: recyclebin5385
 Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core;bundle-version="3.12.2",
@@ -12,4 +12,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jface.text;bundle-version="3.11.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: recyclebin5385.eclipse.plugin.accessorjavadoc.Activator
-Bundle-ActivationPolicy: lazy
+Export-Package: recyclebin5385.eclipse.plugin.accessorjavadoc,
+ recyclebin5385.eclipse.plugin.accessorjavadoc.handlers,
+ recyclebin5385.eclipse.plugin.accessorjavadoc.preferences

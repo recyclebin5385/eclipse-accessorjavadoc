@@ -31,11 +31,13 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
         addField(new StringFieldEditor(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE,
                 "&Setter summary template:", getFieldEditorParent()));
         addField(new StringFieldEditor(PreferenceConstants.P_PARAM_OR_RETURN_TEMPLATE,
-                "@&param NAME or @return template:", getFieldEditorParent()));
+                "@param NAME or @&return template:", getFieldEditorParent()));
+        addField(new StringFieldEditor(PreferenceConstants.P_PERIOD_CHARACTERS, "&Period characters:",
+                getFieldEditorParent()));
     }
 
     @Override
     public void init(IWorkbench workbench) {
+        // NOTE 何もしない
     }
-
 }

@@ -16,5 +16,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE, "Gets ${label.uncapitalized}.");
         store.setDefault(PreferenceConstants.P_SETTER_JAVADOC_SUMMARY_TEMPLATE, "Sets ${label.uncapitalized}.");
         store.setDefault(PreferenceConstants.P_PARAM_OR_RETURN_TEMPLATE, "${label.uncapitalized}");
+        store.setDefault(PreferenceConstants.P_PERIOD_CHARACTERS, ".。");
     }
 }

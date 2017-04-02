@@ -23,4 +23,9 @@ public class PreferenceConstants {
      * getterの@paramまたはsetterの@returnの値のテンプレート
      */
     public static final String P_PARAM_OR_RETURN_TEMPLATE = "paramOrReturnValueTemplate";
+    
+    /**
+     * 句点となる文字列
+     */
+    public static final String P_PERIOD_CHARACTERS = "periodCharacters";
 }

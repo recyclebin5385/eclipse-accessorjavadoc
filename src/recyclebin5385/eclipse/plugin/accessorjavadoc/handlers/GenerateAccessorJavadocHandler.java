@@ -77,8 +77,6 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
     private static final Pattern TRIM_PATTERN = Pattern.compile("[\\x00-\\x20]*(.+?)[\\x00-\\x20]*", Pattern.DOTALL);
 
-    private static final Pattern REMOVE_PERIOD_PATTERN = Pattern.compile("(.+?)\\s*(?:[.。])?", Pattern.DOTALL);
-
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\$\\{(.+?)\\}");
 
     private static final Pattern JAVADOC_TAIL_PATTERN = Pattern.compile("[\\s\r\n\\*]*\\*/\\z");
@@ -285,7 +283,13 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
 
                     // 概要の句点を除去してラベルとする
 
-                    Matcher removePeriodMatcher = REMOVE_PERIOD_PATTERN.matcher(summary);
+                    Pattern removePeriodPattern = Pattern
+                            .compile(
+                                    MessageFormat.format("(.+?)\\s*(?:[{0}])?",
+                                            Pattern.quote(preferenceStore
+                                                    .getString(PreferenceConstants.P_PERIOD_CHARACTERS))),
+                                    Pattern.DOTALL);
+                    Matcher removePeriodMatcher = removePeriodPattern.matcher(summary);
                     if (removePeriodMatcher.matches()) {
                         fieldInfo.m_label = removePeriodMatcher.group(1);
                     } else {

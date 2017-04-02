@@ -24,7 +24,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
 
     @Override
     public void createFieldEditors() {
-        addField(new StringFieldEditor(PreferenceConstants.P_FIELD_NAME_REGEX, "Field name &regex:",
+        addField(new StringFieldEditor(PreferenceConstants.P_FIELD_NAME_REGEX, "&Field name regex:",
                 getFieldEditorParent()));
         addField(new StringFieldEditor(PreferenceConstants.P_GETTER_JAVADOC_SUMMARY_TEMPLATE,
                 "&Getter summary template:", getFieldEditorParent()));

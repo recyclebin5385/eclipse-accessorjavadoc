@@ -201,7 +201,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                     }
                 }
 
-                fieldName = fieldName.toLowerCase();
+                fieldName = fieldName.toLowerCase().replaceAll("_", "");
 
 
                 FieldInfo fieldInfo = new FieldInfo();
@@ -350,7 +350,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
                     continue;
                 }
 
-                String fieldName = accesorNameMatcher.group(2).toLowerCase();
+                String fieldName = accesorNameMatcher.group(2).toLowerCase().replaceAll("_", "");
                 FieldInfo fieldInfo = fieldInfoMap.get(fieldName);
                 if (fieldInfo == null) {
                     // 対応する項目のJavadocがない場合は処理しない

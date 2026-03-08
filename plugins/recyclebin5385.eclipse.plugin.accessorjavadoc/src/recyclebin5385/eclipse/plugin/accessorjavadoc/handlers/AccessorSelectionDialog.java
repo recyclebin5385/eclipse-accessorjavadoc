@@ -157,7 +157,7 @@ public class AccessorSelectionDialog extends Dialog {
         ret.setLayout(new GridLayout(2, false));
 
         Label tableLabel = new Label(ret, SWT.NONE);
-        tableLabel.setText("Select methods to create getters/setters:");
+        tableLabel.setText("Select methods to create Javadocs:");
         GridData tableLabelGridData = new GridData(GridData.FILL_HORIZONTAL);
         tableLabelGridData.horizontalSpan = 2;
         tableLabel.setLayoutData(tableLabelGridData);

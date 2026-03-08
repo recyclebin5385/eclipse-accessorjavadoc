@@ -164,7 +164,7 @@ public class GenerateAccessorJavadocHandler extends AbstractHandler {
          * Javadocコメントをすべて取得する
          *----------------------------------------------------------------*/
 
-        ASTParser parser = ASTParser.newParser(AST.JLS8);
+        ASTParser parser = ASTParser.newParser(AST.getJLSLatest());
 
         parser.setSource(compilationUnit);
 

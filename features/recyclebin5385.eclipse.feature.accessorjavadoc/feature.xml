@@ -2,7 +2,7 @@
 <feature
       id="recyclebin5385.eclipse.feature.accessorjavadoc"
       label="AccessorJavadoc"
-      version="0.1.0.qualifier"
+      version="0.1.2.qualifier"
       provider-name="recyclebin5385">
 
    <description>
@@ -43,9 +43,6 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS &quot;AS IS&
 
    <plugin
          id="recyclebin5385.eclipse.plugin.accessorjavadoc"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
+         version="0.0.0"/>
 
 </feature>

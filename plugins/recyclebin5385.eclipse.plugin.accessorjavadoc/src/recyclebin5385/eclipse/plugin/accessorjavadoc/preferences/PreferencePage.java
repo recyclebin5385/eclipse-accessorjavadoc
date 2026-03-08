@@ -19,7 +19,7 @@ public class PreferencePage extends FieldEditorPreferencePage implements IWorkbe
     public PreferencePage() {
         super(GRID);
         setPreferenceStore(Activator.getDefault().getPreferenceStore());
-        setDescription("A demonstration of a preference page implementation");
+        setDescription("AccessorJavadoc preference page");
     }
 
     @Override

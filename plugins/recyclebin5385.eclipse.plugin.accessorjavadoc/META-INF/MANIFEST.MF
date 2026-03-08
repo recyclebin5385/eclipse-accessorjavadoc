@@ -5,14 +5,15 @@ Bundle-SymbolicName: recyclebin5385.eclipse.plugin.accessorjavadoc;singleton:=tr
 Bundle-Version: 0.1.2.qualifier
 Bundle-Vendor: recyclebin5385
 Require-Bundle: org.eclipse.ui,
- org.eclipse.jdt.core;bundle-version="3.12.2",
- org.eclipse.core.runtime;bundle-version="3.12.0",
- org.eclipse.ui.editors;bundle-version="3.10.1",
- org.eclipse.jdt.ui;bundle-version="3.12.2",
- org.eclipse.jface.text;bundle-version="3.11.2"
+ org.eclipse.jdt.core,
+ org.eclipse.core.runtime,
+ org.eclipse.ui.editors,
+ org.eclipse.jdt.ui,
+ org.eclipse.jface.text
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Activator: recyclebin5385.eclipse.plugin.accessorjavadoc.Activator
 Export-Package: recyclebin5385.eclipse.plugin.accessorjavadoc,
  recyclebin5385.eclipse.plugin.accessorjavadoc.handlers,
  recyclebin5385.eclipse.plugin.accessorjavadoc.preferences
 Bundle-ActivationPolicy: lazy
+Automatic-Module-Name: recyclebin5385.eclipse.plugin.accessorjavadoc

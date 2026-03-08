@@ -12,6 +12,7 @@
     <module>plugins/recyclebin5385.eclipse.plugin.accessorjavadoc</module>
     <module>features/recyclebin5385.eclipse.feature.accessorjavadoc</module>
     <module>repository</module>
+    <module>releng/target</module>
   </modules>
 
   <properties>
@@ -29,6 +30,15 @@
         <artifactId>tycho-maven-plugin</artifactId>
         <version>${tycho.version}</version>
         <extensions>true</extensions>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-p2-repository-plugin</artifactId>
+        <version>${tycho.version}</version>
+        <configuration>
+          <compress>false</compress>
+        </configuration>
       </plugin>
     </plugins>
   </build>

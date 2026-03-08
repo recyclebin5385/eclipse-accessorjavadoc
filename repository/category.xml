@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/recyclebin5385.eclipse.feature.accessorjavadoc_0.1.0.201704021823.jar" id="recyclebin5385.eclipse.feature.accessorjavadoc" version="0.1.0.201704021823">
+   <feature url="features/recyclebin5385.eclipse.feature.accessorjavadoc_0.0.0.jar" id="recyclebin5385.eclipse.feature.accessorjavadoc" version="0.0.0">
       <category name="accessorjavadoc"/>
    </feature>
    <category-def name="accessorjavadoc" label="AccessorJavadoc">

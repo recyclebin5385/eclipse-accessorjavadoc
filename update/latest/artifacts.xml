@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<?artifactRepository version='1.1.0'?>
+<repository name='accessorjavadoc-repository' type='org.eclipse.equinox.p2.artifact.repository.simpleRepository' version='1'>
+  <properties size='1'>
+    <property name='p2.timestamp' value='1773065197944'/>
+  </properties>
+  <mappings size='3'>
+    <rule filter='(&amp; (classifier=osgi.bundle))' output='${repoUrl}/plugins/${id}_${version}.jar'/>
+    <rule filter='(&amp; (classifier=binary))' output='${repoUrl}/binary/${id}_${version}'/>
+    <rule filter='(&amp; (classifier=org.eclipse.update.feature))' output='${repoUrl}/features/${id}_${version}.jar'/>
+  </mappings>
+  <artifacts size='2'>
+    <artifact classifier='org.eclipse.update.feature' id='recyclebin5385.eclipse.feature.accessorjavadoc' version='0.1.2.202603091406'>
+      <properties size='10'>
+        <property name='artifact.size' value='1640'/>
+        <property name='download.size' value='1640'/>
+        <property name='download.checksum.sha-512' value='d75beb69e84936e1e3fa6d8f216ac486a4dbb87f36fabaca52b2f37fce4c27939d6344f05a4b2d6e8c559a32e66e1bcc651e60b5add44c9b79e5a69105de8ece'/>
+        <property name='download.checksum.sha-1' value='24acd5582bc43cd0b34909be978bc21d6a083675'/>
+        <property name='download.checksum.sha-256' value='3c6586348b6c556474217e4f475a2ada41e67199128bc2d875cfbd879ce0b21b'/>
+        <property name='maven-groupId' value='recyclebin5385.eclipse.accessorjavadoc'/>
+        <property name='maven-artifactId' value='recyclebin5385.eclipse.feature.accessorjavadoc'/>
+        <property name='maven-version' value='0.1.2-SNAPSHOT'/>
+        <property name='maven-type' value='eclipse-feature'/>
+        <property name='download.contentType' value='application/zip'/>
+      </properties>
+    </artifact>
+    <artifact classifier='osgi.bundle' id='recyclebin5385.eclipse.plugin.accessorjavadoc' version='0.1.2.202603091406'>
+      <properties size='9'>
+        <property name='artifact.size' value='25509'/>
+        <property name='download.size' value='25509'/>
+        <property name='download.checksum.sha-512' value='0a3ceedb16766396fe55ae60794f37c3135c5c0c29ee96d48f81811b4928da7944fd3bdebe3c70cd749433aa492f93c4a3a570ab077bd83a2965ec7d0753b038'/>
+        <property name='download.checksum.sha-1' value='3984065d96860e556a12709215f56d2111cec672'/>
+        <property name='download.checksum.sha-256' value='5b78a6bd51445f6f7dd295ee045c3874ac01cd8987716c65a3f724a80fa5d836'/>
+        <property name='maven-groupId' value='recyclebin5385.eclipse.accessorjavadoc'/>
+        <property name='maven-artifactId' value='recyclebin5385.eclipse.plugin.accessorjavadoc'/>
+        <property name='maven-version' value='0.1.2-SNAPSHOT'/>
+        <property name='maven-type' value='eclipse-plugin'/>
+      </properties>
+    </artifact>
+  </artifacts>
+</repository>

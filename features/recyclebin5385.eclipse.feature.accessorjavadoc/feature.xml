@@ -6,8 +6,8 @@
       provider-name="recyclebin5385">
 
    <description>
-      An Eclilpse plug-in which adds Javadocs to getter and setter
-methods based on those of the corresponding fields.
+      An Eclipse plug-in that adds Javadoc comments to getters and setters of a Java class.
+The generated Javadoc comments are copied from the corresponding field.
    </description>
 
    <copyright>
